@@ -6,7 +6,14 @@ if($_SESSION['role'] != "parent"){
     header("Location: ../auth/login.php");
 }
 
-$parent_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id'];
+
+// get parent_id from parents table
+$stmt = $conn->prepare("SELECT id FROM parents WHERE user_id = ?");
+$stmt->execute([$user_id]);
+$parent = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$parent_id = $parent['id'];
 
 $stmt = $conn->prepare("
 SELECT bookings.*, children.child_name, hospitals.hospital_name, vaccines.vaccine_name
@@ -16,6 +23,7 @@ JOIN hospitals ON bookings.hospital_id = hospitals.id
 JOIN vaccines ON bookings.vaccine_id = vaccines.id
 WHERE bookings.parent_id = ?
 ");
+
 $stmt->execute([$parent_id]);
 $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>

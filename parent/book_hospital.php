@@ -6,7 +6,14 @@ if($_SESSION['role'] != "parent"){
     header("Location: ../auth/login.php");
 }
 
-$parent_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id'];
+
+// get parent_id from parents table
+$stmt = $conn->prepare("SELECT id FROM parents WHERE user_id = ?");
+$stmt->execute([$user_id]);
+$parent = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$parent_id = $parent['id'];
 
 // fetch children
 $children = $conn->prepare("SELECT * FROM children WHERE parent_id=?");
