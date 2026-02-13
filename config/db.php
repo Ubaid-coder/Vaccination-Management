@@ -3,7 +3,7 @@ $host = "localhost";
 $db   = "vaccination_system";
 $user = "root";
 $pass = "";
-$port = 3307;
+$port = 3306;
 
 try {
     $conn = new PDO("mysql:host=$host; port=$port;dbname=$db", $user, $pass);
