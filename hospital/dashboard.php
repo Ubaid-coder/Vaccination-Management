@@ -9,6 +9,6 @@ if($_SESSION['role'] != "hospital"){
 <h2>Hospital Dashboard</h2>
 
 <ul>
-    <li><a href="view_appointments.php">View Appointments</a></li>
+    <li><a href="./appointments.php">View Appointments</a></li>
     <li><a href="../auth/logout.php">Logout</a></li>
 </ul>

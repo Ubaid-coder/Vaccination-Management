@@ -7,97 +7,207 @@ if($_SESSION['role'] != "parent"){
     exit();
 }
 
+$user_id = $_SESSION['user_id'];
 
+// get parent_id from parents table using user_id
+$stmt = $conn->prepare("SELECT id FROM parents WHERE user_id = ?");
+$stmt->execute([$user_id]);
+$parent = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if(!$parent){
+    die("Parent record not found.");
+}
+
+$parent_id = $parent['id'];
+
+if(isset($_POST['add_child'])){
+
+    $child_name = $_POST['child_name'];
+    $dob = $_POST['dob'];
+    $gender = $_POST['gender'];
+
+    $stmt = $conn->prepare(
+        "INSERT INTO children (parent_id, child_name, dob, gender)
+         VALUES (?,?,?,?)"
+    );
+
+    $stmt->execute([$parent_id, $child_name, $dob, $gender]);
+
+    echo "Child Added Successfully";
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Registration</title>
+    <title>Parent Dashboard - VaxManager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --sidebar-color: #2c3e50;
+            --accent-color: #667eea;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--sidebar-color);
+            position: fixed;
+            color: white;
+            transition: 0.3s;
+        }
+
+        .nav-link {
+            color: #bdc3c7;
+            padding: 15px 25px;
+            transition: 0.3s;
+            border-radius: 10px;
+            margin: 5px 15px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 40px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Animation Logic for smooth interface transition [cite: 39] */
+        .tab-pane {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
-<body class="bg-light d-flex flex-column min-vh-100">
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="index.php">VaxManager</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="register.php">Register Patient</a></li>
-                </ul>
-            </div>
+<body>
+
+    <div class="sidebar">
+        <div class="p-4">
+            <h4 class="fw-bold"><i class="bi bi-shield-check me-2"></i>VaxManager</h4>
         </div>
-    </nav>
+        <ul class="nav flex-column mt-3" id="dashboardTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link" id="children-tab" href="./dashboard.php"><i
+                        class="bi bi-people me-3"></i>My Children</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" id="add-child-tab" href="./add_child.php" role="tab"><i
+                        class="bi bi-person-plus me-3"></i>Add Child</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="book-tab" href="./book_hospital.php" role="tab"><i
+                        class="bi bi-hospital me-3"></i>Book Hospital</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="reports-tab" href="./my_booking.php" role="tab"><i
+                        class="bi bi-file-earmark-medical me-3"></i>My Booking</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="reports-tab" href="./reports.php" role="tab"><i
+                        class="bi bi-file-earmark-medical me-3"></i>Reports</a>
+            </li>
+            <li class="nav-item mt-5">
+                <a href="../auth/logout.php" class="nav-link text-danger"><i class="bi bi-box-arrow-left me-3"></i>Logout</a>
+            </li>
+        </ul>
+    </div>
 
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="card shadow">
-                    <div class="card-header bg-success text-white">
-                        <h2 class="h4 mb-0 text-center">Patient Registration Form</h2>
-                    </div>
-                    <div class="card-body p-4">
-                        <p class="text-muted text-center mb-4">Please fill in your details accurately.</p>
-                        
-                        <form action="submit_data.php" method="POST">
-                            
-                            <div class="mb-3">
-                                <label for="fullname" class="form-label">Full Name</label>
-                                <input type="text" class="form-control" id="fullname" name="fullname" required placeholder="Enter full name">
-                            </div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card shadow">
+                        <div class="card-header bg-success text-white">
+                            <h2 class="h4 mb-0 text-center">Patient Registration Form</h2>
+                        </div>
+                        <div class="card-body p-4">
+                            <p class="text-muted text-center mb-4">Please fill in your details accurately.</p>
 
-                            <div class="mb-3">
-                                <label for="nid" class="form-label">National ID / Passport Number</label>
-                                <input type="text" class="form-control" id="nid" name="nid" required placeholder="e.g., 12345-1234567-1">
-                            </div>
+                            <form action="submit_data.php" method="POST">
 
-                            <div class="mb-3">
-                                <label for="dob" class="form-label">Date of Birth</label>
-                                <input type="date" class="form-control" id="dob" name="dob" required>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="gender" class="form-label">Gender</label>
-                                    <select class="form-select" id="gender" name="gender">
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                        <option value="Other">Other</option>
-                                    </select>
+                                <div class="mb-3">
+                                    <label for="fullname" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="fullname" name="fullname" required placeholder="Enter full name">
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="vaccine" class="form-label">Preferred Vaccine</label>
-                                    <select class="form-select" id="vaccine" name="vaccine">
-                                        <option value="Pfizer">Pfizer</option>
-                                        <option value="Moderna">Moderna</option>
-                                        <option value="Sinopharm">Sinopharm</option>
-                                        <option value="AstraZeneca">AstraZeneca</option>
-                                    </select>
+
+                                <div class="mb-3">
+                                    <label for="nid" class="form-label">National ID / Passport Number</label>
+                                    <input type="text" class="form-control" id="nid" name="nid" required placeholder="e.g., 12345-1234567-1">
                                 </div>
-                            </div>
 
-                            <div class="mb-3">
-                                <label for="contact" class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" id="contact" name="contact" required placeholder="0300-1234567">
-                            </div>
+                                <div class="mb-3">
+                                    <label for="dob" class="form-label">Date of Birth</label>
+                                    <input type="date" class="form-control" id="dob" name="dob" required>
+                                </div>
 
-                            <div class="d-grid gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary btn-lg">Submit Registration</button>
-                            </div>
-                        </form>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="gender" class="form-label">Gender</label>
+                                        <select class="form-select" id="gender" name="gender">
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="vaccine" class="form-label">Preferred Vaccine</label>
+                                        <select class="form-select" id="vaccine" name="vaccine">
+                                            <option value="Pfizer">Pfizer</option>
+                                            <option value="Moderna">Moderna</option>
+                                            <option value="Sinopharm">Sinopharm</option>
+                                            <option value="AstraZeneca">AstraZeneca</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="contact" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="contact" name="contact" required placeholder="0300-1234567">
+                                </div>
+
+                                <div class="d-grid gap-2 mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg">Submit Registration</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <footer class="bg-dark text-white text-center py-3 mt-auto">
-        <div class="container">
-            <p class="mb-0">&copy; 2024 Vaccination Management System Project</p>
-        </div>
-    </footer>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
