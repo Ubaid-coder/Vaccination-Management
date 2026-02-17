@@ -155,17 +155,13 @@ if(isset($_POST['add_child'])){
                         <div class="card-body p-4">
                             <p class="text-muted text-center mb-4">Please fill in your details accurately.</p>
 
-                            <form action="submit_data.php" method="POST">
+                            <form  method="POST">
 
                                 <div class="mb-3">
                                     <label for="fullname" class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" id="fullname" name="fullname" required placeholder="Enter full name">
+                                    <input type="text" class="form-control" id="fullname" name="child_name" required placeholder="Enter full name">
                                 </div>
 
-                                <div class="mb-3">
-                                    <label for="nid" class="form-label">National ID / Passport Number</label>
-                                    <input type="text" class="form-control" id="nid" name="nid" required placeholder="e.g., 12345-1234567-1">
-                                </div>
 
                                 <div class="mb-3">
                                     <label for="dob" class="form-label">Date of Birth</label>
@@ -181,24 +177,11 @@ if(isset($_POST['add_child'])){
                                             <option value="Other">Other</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="vaccine" class="form-label">Preferred Vaccine</label>
-                                        <select class="form-select" id="vaccine" name="vaccine">
-                                            <option value="Pfizer">Pfizer</option>
-                                            <option value="Moderna">Moderna</option>
-                                            <option value="Sinopharm">Sinopharm</option>
-                                            <option value="AstraZeneca">AstraZeneca</option>
-                                        </select>
-                                    </div>
-                                </div>
 
-                                <div class="mb-3">
-                                    <label for="contact" class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control" id="contact" name="contact" required placeholder="0300-1234567">
                                 </div>
 
                                 <div class="d-grid gap-2 mt-4">
-                                    <button type="submit" class="btn btn-primary btn-lg">Submit Registration</button>
+                                    <button name="add_child" type="submit" class="btn btn-primary btn-lg">Submit Registration</button>
                                 </div>
                             </form>
                         </div>
