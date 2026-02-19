@@ -20,7 +20,7 @@ if(isset($_POST['register'])){
 
         $stmt = $conn->prepare("INSERT INTO parents (user_id,name,phone,address) VALUES (?,?,?,?)");
         $stmt->execute([$user_id,$name,$phone,$address]);
-        header("Location: ./login.php");
+        header("Location: ../index.php");
     }
 
     else if($role == "hospital"){
@@ -30,7 +30,7 @@ if(isset($_POST['register'])){
 
         $stmt = $conn->prepare("INSERT INTO hospitals (user_id,hospital_name,address,location) VALUES (?,?,?,?)");
         $stmt->execute([$user_id,$hospital_name,$address,$location]);
-        header("Location: ./login.php");
+        header("Location: ../index.php");
     }
 
     

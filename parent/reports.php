@@ -1,12 +1,7 @@
 <?php
 session_start();
 include("../config/db.php");
-
-// Logic: Check if parent is logged in
-if($_SESSION['role'] != "parent"){
-    header("Location: ../auth/login.php");
-    exit();
-}
+include("./check_auth.php");
 
 $user_id = $_SESSION['user_id'];
 

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("../config/db.php");
+include("./config/db.php");
 
 if(isset($_POST['login'])){
 
@@ -22,13 +22,13 @@ if(isset($_POST['login'])){
             $_SESSION['role'] = $user['role'];
 
             if($user['role'] == "admin"){
-                header("Location: ../admin/dashboard.php");
+                header("Location: ./admin/dashboard.php");
             }
             elseif($user['role'] == "parent"){
-                header("Location: ../parent/dashboard.php");
+                header("Location: ./parent/dashboard.php");
             }
             elseif($user['role'] == "hospital"){
-                header("Location: ../hospital/dashboard.php");
+                header("Location: ./hospital/dashboard.php");
             }
 
         } else {
@@ -275,7 +275,7 @@ if(isset($_POST['login'])){
                 </form>
 
                 <p class="text-center mt-5 text-muted">
-                    Don't have an account? <a href="register.php" class="text-primary fw-bold text-decoration-none">Sign up</a>
+                    Don't have an account? <a href="./auth/register.php" class="text-primary fw-bold text-decoration-none">Sign up</a>
                 </p>
             </div>
         </div>

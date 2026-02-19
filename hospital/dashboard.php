@@ -1,23 +1,19 @@
 <?php
 session_start();
 include("../config/db.php");
+include('./check_auth.php');
 
-if ($_SESSION['role'] != "hospital") {
-    header("Location: ../auth/login.php");
-    exit();
-}
+$hospital_id = $_SESSION['user_id'];
 
-$user_id = $_SESSION['user_id'];
 
-// Get hospital info
-$stmt = $conn->prepare("SELECT * FROM hospitals WHERE user_id = ?");
-$stmt->execute([$user_id]);
-$hospital = $stmt->fetch(PDO::FETCH_ASSOC);
+$bookings = $conn->prepare("SELECT COUNT(*) FROM bookings WHERE hospital_id=?");
+$bookings->execute([$hospital_id]);
 
-// Count pending appointments for the badge
-$stmt = $conn->prepare("SELECT COUNT(*) FROM bookings WHERE hospital_id = ?");
-$stmt->execute([$hospital['id']]);
-$appointment_count = $stmt->fetchColumn();
+$vaccines = $conn->prepare("SELECT COUNT(*) FROM vaccines ");
+$vaccines->execute();
+
+$reports = $conn->prepare("SELECT COUNT(*) FROM vaccination_reports");
+$reports->execute();
 ?>
 
 <!DOCTYPE html>

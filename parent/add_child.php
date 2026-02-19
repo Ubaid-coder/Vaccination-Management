@@ -1,13 +1,10 @@
 <?php
 session_start();
 include("../config/db.php");
-
-if($_SESSION['role'] != "parent"){
-    header("Location: ../auth/login.php");
-    exit();
-}
+include("./check_auth.php");
 
 $user_id = $_SESSION['user_id'];
+$success_msg = "";
 
 // get parent_id from parents table using user_id
 $stmt = $conn->prepare("SELECT id FROM parents WHERE user_id = ?");
@@ -21,29 +18,23 @@ if(!$parent){
 $parent_id = $parent['id'];
 
 if(isset($_POST['add_child'])){
-
     $child_name = $_POST['child_name'];
     $dob = $_POST['dob'];
     $gender = $_POST['gender'];
 
-    $stmt = $conn->prepare(
-        "INSERT INTO children (parent_id, child_name, dob, gender)
-         VALUES (?,?,?,?)"
-    );
-
-    $stmt->execute([$parent_id, $child_name, $dob, $gender]);
-
-    echo "Child Added Successfully";
+    $stmt = $conn->prepare("INSERT INTO children (parent_id, child_name, dob, gender) VALUES (?,?,?,?)");
+    if($stmt->execute([$parent_id, $child_name, $dob, $gender])) {
+        $success_msg = "Child Added Successfully!";
+    }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parent Dashboard - VaxManager</title>
+    <title>Add Child - VaxManager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -52,145 +43,140 @@ if(isset($_POST['add_child'])){
         :root {
             --sidebar-color: #2c3e50;
             --accent-color: #667eea;
+            --bg-light: #f8fafc;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f8fafc;
+            background-color: var(--bg-light);
+            margin: 0;
         }
 
+        /* Responsive Sidebar */
         .sidebar {
             width: 260px;
             height: 100vh;
             background: var(--sidebar-color);
             position: fixed;
+            left: 0;
+            top: 0;
             color: white;
-            transition: 0.3s;
+            transition: all 0.3s;
+            z-index: 1000;
         }
 
         .nav-link {
             color: #bdc3c7;
-            padding: 15px 25px;
+            padding: 12px 25px;
             transition: 0.3s;
-            border-radius: 10px;
-            margin: 5px 15px;
+            border-radius: 8px;
+            margin: 4px 15px;
+            display: flex;
+            align-items: center;
         }
 
-        .nav-link:hover,
-        .nav-link.active {
+        .nav-link:hover, .nav-link.active {
             background: var(--accent-color);
             color: white;
         }
 
+        /* Main Content Adjustment */
         .main-content {
             margin-left: 260px;
-            padding: 40px;
+            padding: 30px;
+            transition: all 0.3s;
         }
 
-        .card {
+        .form-card {
             border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
         }
 
-        /* Animation Logic for smooth interface transition [cite: 39] */
-        .tab-pane {
-            animation: fadeIn 0.5s ease-in-out;
+        .btn-primary {
+            background: var(--accent-color);
+            border: none;
+            padding: 12px;
+            font-weight: 500;
+            border-radius: 10px;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .form-control, .form-select {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
         }
     </style>
 </head>
-
 <body>
 
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="p-4">
             <h4 class="fw-bold"><i class="bi bi-shield-check me-2"></i>VaxManager</h4>
         </div>
-        <ul class="nav flex-column mt-3" id="dashboardTabs" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link" id="children-tab" href="./dashboard.php"><i
-                        class="bi bi-people me-3"></i>My Children</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" id="add-child-tab" href="./add_child.php" role="tab"><i
-                        class="bi bi-person-plus me-3"></i>Add Child</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="book-tab" href="./book_hospital.php" role="tab"><i
-                        class="bi bi-hospital me-3"></i>Book Hospital</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="reports-tab" href="./my_booking.php" role="tab"><i
-                        class="bi bi-file-earmark-medical me-3"></i>My Booking</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="reports-tab" href="./reports.php" role="tab"><i
-                        class="bi bi-file-earmark-medical me-3"></i>Reports</a>
-            </li>
-            <li class="nav-item mt-5">
-                <a href="../auth/logout.php" class="nav-link text-danger"><i class="bi bi-box-arrow-left me-3"></i>Logout</a>
-            </li>
+        <ul class="nav flex-column mt-2">
+            <li class="nav-item"><a class="nav-link" href="./dashboard.php"><i class="bi bi-people me-3"></i>My Children</a></li>
+            <li class="nav-item"><a class="nav-link active" href="./add_child.php"><i class="bi bi-person-plus me-3"></i>Add Child</a></li>
+            <li class="nav-item"><a class="nav-link" href="./book_hospital.php"><i class="bi bi-hospital me-3"></i>Book Hospital</a></li>
+            <li class="nav-item"><a class="nav-link" href="./my_booking.php"><i class="bi bi-calendar-check me-3"></i>My Bookings</a></li>
+            <li class="nav-item"><a class="nav-link" href="./reports.php"><i class="bi bi-file-earmark-medical me-3"></i>Reports</a></li>
+            <li class="nav-item mt-5"><a href="../auth/logout.php" class="nav-link text-danger"><i class="bi bi-box-arrow-left me-3"></i>Logout</a></li>
         </ul>
     </div>
 
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-6">
-                    <div class="card shadow">
-                        <div class="card-header bg-success text-white">
-                            <h2 class="h4 mb-0 text-center">Patient Registration Form</h2>
-                        </div>
-                        <div class="card-body p-4">
-                            <p class="text-muted text-center mb-4">Please fill in your details accurately.</p>
+    <div class="main-content">
+       
 
-                            <form  method="POST">
+        <div class="container-fluid">
+            <div class="page-header">
+                <h3 class="fw-bold text-dark">Add Your Child</h3>
+                <p class="text-muted">Register your child to manage their vaccination schedule.</p>
+            </div>
 
-                                <div class="mb-3">
-                                    <label for="fullname" class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" id="fullname" name="child_name" required placeholder="Enter full name">
+            <?php if($success_msg): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle me-2"></i> <?php echo $success_msg; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
+
+            <div class="row">
+                <div class="col-xl-6 col-lg-8">
+                    <div class="card form-card p-4">
+                        <form method="POST">
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Child's Full Name</label>
+                                <input type="text" class="form-control" name="child_name" required placeholder="John Doe Jr.">
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label class="form-label fw-semibold">Date of Birth</label>
+                                    <input type="date" class="form-control" name="dob" required>
                                 </div>
-
-
-                                <div class="mb-3">
-                                    <label for="dob" class="form-label">Date of Birth</label>
-                                    <input type="date" class="form-control" id="dob" name="dob" required>
+                                <div class="col-md-6 mb-4">
+                                    <label class="form-label fw-semibold">Gender</label>
+                                    <select class="form-select" name="gender">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
                                 </div>
+                            </div>
 
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="gender" class="form-label">Gender</label>
-                                        <select class="form-select" id="gender" name="gender">
-                                            <option value="Male">Male</option>
-                                            <option value="Female">Female</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-
-                                </div>
-
-                                <div class="d-grid gap-2 mt-4">
-                                    <button name="add_child" type="submit" class="btn btn-primary btn-lg">Submit Registration</button>
-                                </div>
-                            </form>
-                        </div>
+                            <div class="mt-2">
+                                <button name="add_child" type="submit" class="btn btn-primary w-100 shadow-sm">
+                                    <i class="bi bi-plus-circle me-2"></i> Register Child
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

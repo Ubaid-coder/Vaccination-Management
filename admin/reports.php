@@ -1,11 +1,7 @@
 <?php
 session_start();
 include("../config/db.php");
-
-if($_SESSION['role'] != "admin"){
-    header("Location: ../auth/login.php");
-    exit();
-}
+include("./check_auth.php");
 
 $where = "";
 $params = [];
