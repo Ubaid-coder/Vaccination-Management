@@ -24,7 +24,7 @@ $children_list = $children->fetchAll();
 $hospitals = $conn->query("SELECT * FROM hospitals")->fetchAll();
 $vaccines = $conn->query("
     SELECT * FROM vaccines 
-    WHERE status='available' AND approval_status='approved'
+    WHERE status='available'
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 

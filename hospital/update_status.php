@@ -15,8 +15,8 @@ if(isset($_POST['update'])){
     $date = date("Y-m-d");
 
     // Update booking status
-    $stmt = $conn->prepare("UPDATE bookings SET status='vaccinated' WHERE id=?");
-    $stmt->execute([$booking_id]);
+    $stmt = $conn->prepare("UPDATE bookings SET status=? WHERE id=?");
+    $stmt->execute([$status, $booking_id]);
 
     // Insert report
     $stmt = $conn->prepare("INSERT INTO vaccination_reports (booking_id,status,remarks,report_date) VALUES (?,?,?,?)");
@@ -51,6 +51,7 @@ if(isset($_POST['update'])){
                 <select name="status" class="form-select" required>
                     <option value="">Select Status</option>
                     <option value="vaccinated">Vaccinated</option>
+                    <option value="rejected">Rejected</option>
                     <option value="not_vaccinated">Not Vaccinated</option>
                 </select>
             </div>
