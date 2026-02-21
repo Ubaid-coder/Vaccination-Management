@@ -40,7 +40,7 @@ $reports->execute();
 <div class="sidebar d-flex flex-column p-3">
     <h3 class="text-center fw-bold mb-4">VaxManager</h3>
     <a href="dashboard.php" class="nav-link active"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-    <a href="view_appointments.php" class="nav-link"><i class="bi bi-calendar-event me-2"></i> Appointments</a>
+    <a href="appointments.php" class="nav-link"><i class="bi bi-calendar-event me-2"></i> Appointments</a>
     <a class="nav-link" href="./reports.php"><i class="bi bi-file-earmark-medical me-3"></i>Reports</a>
     <a href="../auth/logout.php" class="nav-link text-danger mt-auto"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
 </div>
