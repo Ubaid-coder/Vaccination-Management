@@ -9,7 +9,6 @@ $hospitals = $conn->query("SELECT COUNT(*) FROM hospitals")->fetchColumn();
 $reports = $conn->query("SELECT COUNT(*) FROM vaccination_reports")->fetchColumn();
 
 
-echo $user_id;
 ?>
 
 <div class="row">

@@ -5,25 +5,36 @@
 
 <?php
 $stmt = $conn->prepare("
-SELECT parents.name as parent_name, child_name,vaccine_name, hospital_name,status, appointment_date AS date 
-FROM bookings
+SELECT 
+    parents.name AS parent_name,
+    children.child_name,
+    vaccines.vaccine_name,
+    hospitals.hospital_name,
+    vaccination_reports.status,
+    vaccination_reports.remarks,
+    vaccination_reports.report_date AS date
+FROM vaccination_reports
+JOIN bookings ON vaccination_reports.booking_id = bookings.id
 JOIN parents ON bookings.parent_id = parents.id
-JOIN children ON parents.id = children.parent_id
+JOIN children ON bookings.child_id = children.id
 JOIN vaccines ON bookings.vaccine_id = vaccines.id
 JOIN hospitals ON bookings.hospital_id = hospitals.id
-JOIN vaccination_reports ON bookings.id = vaccinations_reports.booking_id
+ORDER BY vaccination_reports.report_date DESC
 ");
+
+$stmt->execute(); // ✅ VERY IMPORTANT
 $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <?php if(count($reports) > 0): ?>
 <table class="table table-bordered">
 <tr>
-<th>ParentName</th>
-<th>ChildName</th>
+<th>Parent Name</th>
+<th>Child Name</th>
 <th>Vaccine</th>
 <th>Hospital</th>
 <th>Status</th>
+<th>Remarks</th>
 <th>Date</th>
 </tr>
 
@@ -34,6 +45,7 @@ $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <td><?= htmlspecialchars($r['vaccine_name']) ?></td>
 <td><?= htmlspecialchars($r['hospital_name']) ?></td>
 <td><?= htmlspecialchars($r['status']) ?></td>
+<td><?= htmlspecialchars($r['remarks']) ?></td>
 <td><?= htmlspecialchars($r['date']) ?></td>
 </tr>
 <?php endforeach; ?>

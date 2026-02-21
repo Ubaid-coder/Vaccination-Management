@@ -12,8 +12,8 @@ if(isset($_POST['update_status'])){
     $remarks = $_POST['remarks'];
 
     // Update booking status
-    $stmt = $conn->prepare("UPDATE bookings SET status=? WHERE id=? AND hospital_id=?");
-    $stmt->execute([$status, $booking_id, $hospital_id]);
+    $stmt = $conn->prepare("UPDATE bookings SET status=? WHERE id=?");
+    $stmt->execute([$status, $booking_id]);
 
     // Insert into vaccination_reports
     $stmt2 = $conn->prepare("
@@ -68,13 +68,14 @@ $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .stat-card:hover { transform: translateY(-5px); }
     </style>
 </head>
-
+<body>
 
 <div class="sidebar d-flex flex-column p-3">
     <h3 class="text-center fw-bold mb-4">VaxManager</h3>
-    <a href="dashboard.php" class="nav-link "><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-    <a href="appointments.php" class="nav-link active"><i class="bi bi-calendar-event me-2"></i> Appointments</a>
-    <a class="nav-link" href="./reports.php"><i class="bi bi-file-earmark-medical me-3"></i>Reports</a>
+    <a href="dashboard.php " class="nav-link "><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+    <a href="manage_vaccines.php" class="nav-link active"><i class="bi bi-calendar-event me-2"></i> Vaccines</a>
+    <a href="appointments.php" class="nav-link"><i class="bi bi-calendar-event me-2"></i> Appointments</a>
+    <a class="nav-link " href="./reports.php"><i class="bi bi-file-earmark-medical me-3"></i>Reports</a>
     <a href="../auth/logout.php" class="nav-link text-danger mt-auto"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
 </div>
 
